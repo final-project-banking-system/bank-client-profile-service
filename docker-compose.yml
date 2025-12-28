@@ -1,0 +1,37 @@
+services:
+  client_profile_db:
+    image: postgres:15-alpine
+    container_name: client_profile_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: client_profile
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - client-profile-network
+
+  app:
+    build: .
+    container_name: client-profile-app
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://client_profile_db:5432/client_profile
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8083:8083"
+    networks:
+      - client-profile-network
+
+volumes:
+  postgres-data:
+
+networks:
+  client-profile-network:
+    name: client-profile-network
+    driver: bridge
