@@ -6,7 +6,7 @@ spring:
     name: client-profile-service
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/client_profile}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://client_profile_db:5432/client_profile}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
@@ -24,9 +24,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://auth-service:8081/auth
-          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/.well-known/jwks.json
-
+          issuer-uri: bank-auth-service
+          jwk-set-uri: http://host.docker.internal:8081/.well-known/jwks.json
 
 logging:
   level:

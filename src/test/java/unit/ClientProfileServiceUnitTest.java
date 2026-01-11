@@ -68,30 +68,30 @@ public class ClientProfileServiceUnitTest {
 
     @Test
     public void testGetProfileByEmail_WhenProfileExists_ShouldReturnProfile() {
-        when(clientProfileRepository.findByEmail(EMAIL))
+        when(clientProfileRepository.findByUserId(USER_ID))
                 .thenReturn(Optional.of(testClientProfileEntity));
         when(clientProfileMapper.toResponse(testClientProfileEntity))
                 .thenReturn(testClientProfileResponse);
 
-        ClientProfileResponse response = clientProfileService.getProfileByEmail(EMAIL);
+        ClientProfileResponse response = clientProfileService.getProfileByUserId(USER_ID);
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(PROFILE_ID);
         assertThat(response.getEmail()).isEqualTo(EMAIL);
-        verify(clientProfileRepository, times(1)).findByEmail(EMAIL);
+        verify(clientProfileRepository, times(1)).findByUserId(USER_ID);
         verify(clientProfileMapper, times(1)).toResponse(testClientProfileEntity);
     }
 
     @Test
     public void testGetProfileByEmail_WhenProfileDoesNotExist_ShouldThrowException() {
-        when(clientProfileRepository.findByEmail(EMAIL))
+        when(clientProfileRepository.findByUserId(USER_ID))
                 .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> clientProfileService.getProfileByEmail(EMAIL))
+        assertThatThrownBy(() -> clientProfileService.getProfileByUserId(USER_ID))
                 .isInstanceOf(ClientProfileNotFoundException.class)
-                .hasMessageContaining(EMAIL);
+                .hasMessageContaining(USER_ID.toString());
 
-        verify(clientProfileRepository, times(1)).findByEmail(EMAIL);
+        verify(clientProfileRepository, times(1)).findByUserId(USER_ID);
         verify(clientProfileMapper, never()).toResponse(any());
     }
 
@@ -102,7 +102,7 @@ public class ClientProfileServiceUnitTest {
         request.setLastName("LastName_Updated");
         request.setPhone("123456789_Updated");
 
-        when(clientProfileRepository.findByEmail(EMAIL))
+        when(clientProfileRepository.findByUserId(USER_ID))
                 .thenReturn(Optional.of(testClientProfileEntity));
 
         ClientProfileEntity savedEntity = new ClientProfileEntity();
@@ -135,7 +135,7 @@ public class ClientProfileServiceUnitTest {
         when(clientProfileMapper.toResponse(any(ClientProfileEntity.class)))
                 .thenReturn(updatedClientProfileResponse);
 
-        ClientProfileResponse response = clientProfileService.updateProfile(EMAIL, request);
+        ClientProfileResponse response = clientProfileService.updateProfile(USER_ID, request);
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(PROFILE_ID);
@@ -150,14 +150,14 @@ public class ClientProfileServiceUnitTest {
 
     @Test
     public void testUpdateProfileByEmail_WhenProfileDoesNotExist_ShouldThrowException() {
-        when(clientProfileRepository.findByEmail(EMAIL))
+        when(clientProfileRepository.findByUserId(USER_ID))
                 .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> clientProfileService.updateProfile(EMAIL, new ClientProfileRequest()))
+        assertThatThrownBy(() -> clientProfileService.updateProfile(USER_ID, new ClientProfileRequest()))
                 .isInstanceOf(ClientProfileNotFoundException.class)
-                .hasMessageContaining(EMAIL);
+                .hasMessageContaining(USER_ID.toString());
 
-        verify(clientProfileRepository, times(1)).findByEmail(EMAIL);
+        verify(clientProfileRepository, times(1)).findByUserId(USER_ID);
         verify(clientProfileMapper, never()).toResponse(any());
     }
 }

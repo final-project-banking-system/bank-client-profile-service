@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Сервис отвечает за управление клиентскими данными
@@ -25,32 +26,32 @@ public class ClientProfileService {
     private final ClientProfileMapper clientProfileMapper;
 
     /**
-     * Получает профиль клиента по его email.
+     * Получает профиль клиента по его userId.
      *
-     * @param email email клиента
+     * @param userId userId клиента
      * @return DTO c данными по профилю клиента
      */
-    public ClientProfileResponse getProfileByEmail(String email) {
-        log.info("Попытка поиска профиля клиента по email: {}", email);
-        ClientProfileEntity clientProfileEntity = clientProfileRepository.findByEmail(email)
-                .orElseThrow(() -> new ClientProfileNotFoundException(email));
+    public ClientProfileResponse getProfileByUserId(UUID userId) {
+        log.info("Попытка поиска профиля клиента по email: {}", userId);
+        ClientProfileEntity clientProfileEntity = clientProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new ClientProfileNotFoundException(userId));
 
         return clientProfileMapper.toResponse(clientProfileEntity);
     }
 
     /**
-     * Обновляет профиль клиента по его email.
+     * Обновляет профиль клиента по его userId.
      *
-     * @param email email пользователя
+     * @param userId userId пользователя
      * @param request DTO с обновленным данными пользователя
      * @return обновленный DTO пользователя
      */
     @Transactional
-    public ClientProfileResponse updateProfile(String email, ClientProfileRequest request) {
-        log.info("Обновление профиля клиента с email: {}", email);
+    public ClientProfileResponse updateProfile(UUID userId, ClientProfileRequest request) {
+        log.info("Обновление профиля клиента с email: {}", userId);
 
-        ClientProfileEntity clientProfile = clientProfileRepository.findByEmail(email)
-                .orElseThrow(() -> new ClientProfileNotFoundException(email));
+        ClientProfileEntity clientProfile = clientProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new ClientProfileNotFoundException(userId));
 
         if (request.getEmail() != null) {
             clientProfile.setEmail(request.getEmail());
@@ -77,7 +78,7 @@ public class ClientProfileService {
         clientProfile.setUpdatedAt(LocalDateTime.now());
 
         ClientProfileEntity clientProfileUpdated = clientProfileRepository.save(clientProfile);
-        log.info("Профиль клиента обновлен: {}", email);
+        log.info("Профиль клиента обновлен: {}", userId);
 
         return clientProfileMapper.toResponse(clientProfileUpdated);
     }

@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 /**
  * Контроллер для управления профилями клиентов
  */
@@ -19,24 +21,24 @@ public class ClientProfileController {
 
     /**
      * Получает информацию о клиенте
-     * @param email email клиента
+     * @param userId userId клиента
      * @return DTO с информацией о клиенте
      */
-    @GetMapping("/{email}")
+    @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public ClientProfileResponse getClientProfile(@PathVariable String email) {
-        return clientProfileService.getProfileByEmail(email);
+    public ClientProfileResponse getClientProfile(@PathVariable UUID userId) {
+        return clientProfileService.getProfileByUserId(userId);
     }
 
     /**
      * Обновляет информацию о клиенте
-     * @param email email клиента
+     * @param userId userId клиента
      * @return ResponseEntity с обновленным DTO клиента
      */
-    @PutMapping("/{email}")
+    @PutMapping("/{userId}")
     public ResponseEntity<ClientProfileResponse> updateClientProfile(
-            @PathVariable String email, @RequestBody ClientProfileRequest request
+            @PathVariable UUID userId, @RequestBody ClientProfileRequest request
     ) {
-        return ResponseEntity.ok(clientProfileService.updateProfile(email, request));
+        return ResponseEntity.ok(clientProfileService.updateProfile(userId, request));
     }
 }
