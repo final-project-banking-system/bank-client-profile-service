@@ -1,0 +1,66 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-client-profiles
+      author: kirill25
+      changes:
+        - createTable:
+            tableName: client_profiles
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    unique: true
+
+              - column:
+                  name: first_name
+                  type: varchar(100)
+
+              - column:
+                  name: last_name
+                  type: varchar(100)
+
+              - column:
+                  name: middle_name
+                  type: varchar(100)
+
+              - column:
+                  name: email
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: phone
+                  type: varchar(100)
+
+              - column:
+                  name: birth_date
+                  type: date
+
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: idx_client_profiles_user_id
+            tableName: client_profiles
+            columns:
+              - column:
+                  name: user_id
+            unique: true

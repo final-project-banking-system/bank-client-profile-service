@@ -1,0 +1,56 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-addresses
+      author: kirill25
+      changes:
+        - createTable:
+            tableName: addresses
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: profile_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: country
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: city
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: street
+                  type: TEXT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: postal_code
+                  type: varchar(20)
+
+        - addForeignKeyConstraint:
+            baseTableName: addresses
+            baseColumnNames: profile_id
+            referencedTableName: client_profiles
+            referencedColumnNames: id
+            constraintName: fk_addresses_profiles
+            onDelete: CASCADE

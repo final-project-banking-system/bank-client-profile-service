@@ -11,7 +11,11 @@ RUN mvn clean package -DskipTests -Dmaven.test.skip=true
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 
+RUN useradd -r -u 10001 -m appuser
+
 COPY --from=builder /app/target/*.jar app.jar
+
+USER appuser
 
 EXPOSE 8083
 

@@ -1,12 +1,12 @@
 package unit;
 
-import org.example.dto.request.ClientProfileRequest;
-import org.example.dto.response.ClientProfileResponse;
-import org.example.exception.ClientProfileNotFoundException;
-import org.example.mapper.ClientProfileMapper;
-import org.example.model.ClientProfileEntity;
-import org.example.repository.ClientProfileRepository;
-import org.example.service.ClientProfileService;
+import banking.profile.dto.request.ClientProfileRequest;
+import banking.profile.dto.response.ClientProfileResponse;
+import banking.profile.exception.ClientProfileNotFoundException;
+import banking.profile.mapper.ClientProfileMapper;
+import banking.profile.model.ClientProfileEntity;
+import banking.profile.repository.ClientProfileRepository;
+import banking.profile.service.ClientProfileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

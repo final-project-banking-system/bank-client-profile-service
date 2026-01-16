@@ -1,0 +1,56 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-documents
+      author: kirill25
+      changes:
+        - createTable:
+            tableName: documents
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: profile_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: number
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: issued_by
+                  type: text
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: issued_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: expires_at
+                  type: timestamp
+
+        - addForeignKeyConstraint:
+            baseTableName: documents
+            baseColumnNames: profile_id
+            referencedTableName: client_profiles
+            referencedColumnNames: id
+            constraintName: fk_documents_profiles
+            onDelete: CASCADE

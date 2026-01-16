@@ -1,11 +1,13 @@
-package org.example.controller;
+package banking.profile.controller;
 
+import banking.profile.dto.request.ClientProfileRequest;
+import banking.profile.dto.response.ClientProfileResponse;
+import banking.profile.service.ClientProfileService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.dto.request.ClientProfileRequest;
-import org.example.dto.response.ClientProfileResponse;
-import org.example.service.ClientProfileService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -21,24 +23,26 @@ public class ClientProfileController {
 
     /**
      * Получает информацию о клиенте
-     * @param userId userId клиента
+     * @param jwt jwt токен
      * @return DTO с информацией о клиенте
      */
-    @GetMapping("/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public ClientProfileResponse getClientProfile(@PathVariable UUID userId) {
+    @GetMapping
+    public ClientProfileResponse getClientProfile(@AuthenticationPrincipal Jwt jwt) {
+        UUID userId = UUID.fromString(jwt.getSubject());
         return clientProfileService.getProfileByUserId(userId);
     }
 
     /**
      * Обновляет информацию о клиенте
-     * @param userId userId клиента
+     * @param jwt jwt токен
      * @return ResponseEntity с обновленным DTO клиента
      */
-    @PutMapping("/{userId}")
+    @PutMapping
     public ResponseEntity<ClientProfileResponse> updateClientProfile(
-            @PathVariable UUID userId, @RequestBody ClientProfileRequest request
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestBody @Valid ClientProfileRequest request
     ) {
+        UUID userId = UUID.fromString(jwt.getSubject());
         return ResponseEntity.ok(clientProfileService.updateProfile(userId, request));
     }
 }

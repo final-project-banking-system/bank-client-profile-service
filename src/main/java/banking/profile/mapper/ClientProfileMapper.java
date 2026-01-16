@@ -1,7 +1,7 @@
-package org.example.mapper;
+package banking.profile.mapper;
 
-import org.example.dto.response.ClientProfileResponse;
-import org.example.model.ClientProfileEntity;
+import banking.profile.dto.response.ClientProfileResponse;
+import banking.profile.model.ClientProfileEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

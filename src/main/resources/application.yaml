@@ -13,22 +13,50 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-    show-sql: true
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    default-schema: public
+    liquibase-schema: public
+
+  kafka:
+    bootstrap-servers: kafka:9092
+    topics:
+      - name: auth.users
+        partitions: 1
+        replication-factor: 1
+      - name: auth.logins
+        partitions: 1
+        replication-factor: 1
+      - name: system.errors
+        partitions: 1
+        replication-factor: 1
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 24h
+      cache-null-values: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
 
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: bank-auth-service
-          jwk-set-uri: http://host.docker.internal:8081/.well-known/jwks.json
-
-logging:
-  level:
-    org.springframework.web: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+          jwk-set-uri: http://bank-auth-service:8081/auth/.well-known/jwks.json

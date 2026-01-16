@@ -1,6 +1,6 @@
-package org.example.repository;
+package banking.profile.repository;
 
-import org.example.model.ClientProfileEntity;
+import banking.profile.model.ClientProfileEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

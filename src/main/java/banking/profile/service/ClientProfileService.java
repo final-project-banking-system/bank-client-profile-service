@@ -1,13 +1,15 @@
-package org.example.service;
+package banking.profile.service;
 
+import banking.profile.dto.request.ClientProfileRequest;
+import banking.profile.dto.response.ClientProfileResponse;
+import banking.profile.exception.ClientProfileNotFoundException;
+import banking.profile.mapper.ClientProfileMapper;
+import banking.profile.model.ClientProfileEntity;
+import banking.profile.repository.ClientProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.dto.request.ClientProfileRequest;
-import org.example.dto.response.ClientProfileResponse;
-import org.example.exception.ClientProfileNotFoundException;
-import org.example.mapper.ClientProfileMapper;
-import org.example.repository.ClientProfileRepository;
-import org.example.model.ClientProfileEntity;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +33,12 @@ public class ClientProfileService {
      * @param userId userId клиента
      * @return DTO c данными по профилю клиента
      */
+    @Cacheable(
+            value = "profiles",
+            key = "#userId.toString()"
+    )
     public ClientProfileResponse getProfileByUserId(UUID userId) {
-        log.info("Попытка поиска профиля клиента по email: {}", userId);
+        log.info("Попытка поиска профиля клиента по userId: {}", userId);
         ClientProfileEntity clientProfileEntity = clientProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new ClientProfileNotFoundException(userId));
 
@@ -47,8 +53,12 @@ public class ClientProfileService {
      * @return обновленный DTO пользователя
      */
     @Transactional
+    @CacheEvict(
+            value = "profiles",
+            key = "#userId.toString()"
+    )
     public ClientProfileResponse updateProfile(UUID userId, ClientProfileRequest request) {
-        log.info("Обновление профиля клиента с email: {}", userId);
+        log.info("Обновление профиля клиента с userId: {}", userId);
 
         ClientProfileEntity clientProfile = clientProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new ClientProfileNotFoundException(userId));
@@ -81,5 +91,21 @@ public class ClientProfileService {
         log.info("Профиль клиента обновлен: {}", userId);
 
         return clientProfileMapper.toResponse(clientProfileUpdated);
+    }
+
+    /**
+     * Обновляет профиль клиента по его userId.
+     *
+     * @param userId userId пользователя
+     * @param email email пользователя
+     */
+    @Transactional
+    public void createProfile(UUID userId, String email) {
+        ClientProfileEntity profile = new ClientProfileEntity();
+        profile.setUserId(userId);
+        profile.setEmail(email);
+        profile.setCreatedAt(LocalDateTime.now());
+        profile.setUpdatedAt(LocalDateTime.now());
+        clientProfileRepository.save(profile);
     }
 }
