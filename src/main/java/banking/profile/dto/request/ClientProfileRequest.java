@@ -10,7 +10,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -34,8 +33,4 @@ public class ClientProfileRequest {
 
     @Past
     private LocalDate birthDate;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
 }

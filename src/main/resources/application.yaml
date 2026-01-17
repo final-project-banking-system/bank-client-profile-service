@@ -58,5 +58,11 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: bank-auth-service
-          jwk-set-uri: http://bank-auth-service:8081/auth/.well-known/jwks.json
+          issuer-uri: auth-service
+          jwk-set-uri: http://auth-service:8081/auth/.well-known/jwks.json
+
+banking:
+  kafka:
+    topics:
+      systemErrors: system.errors
+      users: auth.users

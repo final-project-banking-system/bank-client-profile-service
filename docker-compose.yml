@@ -81,15 +81,13 @@ services:
 
   client-profile-service:
     build:
-      context: ./bank-client-profile-service
+      context: .
     image: client-profile-service
     container_name: client-profile-service
     restart: unless-stopped
     depends_on:
       client_profile_db:
         condition: service_healthy
-      auth-service:
-        condition: service_started
       kafka:
         condition: service_healthy
     environment:
