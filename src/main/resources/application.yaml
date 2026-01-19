@@ -1,0 +1,68 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: client-profile-service
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://client_profile_db:5432/client_profile}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    default-schema: public
+    liquibase-schema: public
+
+  kafka:
+    bootstrap-servers: kafka:9092
+    topics:
+      - name: auth.users
+        partitions: 1
+        replication-factor: 1
+      - name: auth.logins
+        partitions: 1
+        replication-factor: 1
+      - name: system.errors
+        partitions: 1
+        replication-factor: 1
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 24h
+      cache-null-values: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: auth-service
+          jwk-set-uri: http://auth-service:8081/auth/.well-known/jwks.json
+
+banking:
+  kafka:
+    topics:
+      systemErrors: system.errors
+      users: auth.users

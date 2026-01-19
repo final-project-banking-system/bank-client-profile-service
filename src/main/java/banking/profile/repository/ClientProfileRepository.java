@@ -1,0 +1,11 @@
+package banking.profile.repository;
+
+import banking.profile.model.ClientProfileEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+import java.util.UUID;
+
+public interface ClientProfileRepository extends JpaRepository<ClientProfileEntity, UUID> {
+    Optional<ClientProfileEntity> findByUserId(UUID userId);
+}
