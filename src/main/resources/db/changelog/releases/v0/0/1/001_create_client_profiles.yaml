@@ -57,6 +57,13 @@ databaseChangeLog:
                   type: timestamp
                   constraints:
                     nullable: false
+
+              - column:
+                  name: version
+                  type: bigint
+                  constraints:
+                    nullable: false
+
         - createIndex:
             indexName: idx_client_profiles_user_id
             tableName: client_profiles

@@ -1,22 +1,14 @@
 FROM maven:3.9.9-eclipse-temurin-17 AS builder
-WORKDIR /app
-
+WORKDIR /build
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
-
+RUN mvn -B -DskipTests dependency:go-offline
 COPY src ./src
-
-RUN mvn clean package -DskipTests -Dmaven.test.skip=true
+RUN mvn -B -DskipTests package
 
 FROM eclipse-temurin:17-jre
-WORKDIR /app
-
+WORKDIR /opt/app
 RUN useradd -r -u 10001 -m appuser
-
-COPY --from=builder /app/target/*.jar app.jar
-
+COPY --from=builder /build/target/*.jar /opt/app/app.jar
 USER appuser
-
 EXPOSE 8083
-
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -35,7 +35,6 @@ spring:
     bootstrap-servers: kafka:9092
     consumer:
       group-id: ${spring.application.name}
-      auto-offset-reset: earliest
       enable-auto-commit: false
       isolation-level: read_committed
       max-poll-records: 1
@@ -44,6 +43,19 @@ spring:
       enable.idempotence: true
     listener:
       missing-topics-fatal: false
+    topics:
+      - name: auth.users
+        partitions: 1
+        replication-factor: 1
+      - name: auth.users.dq
+        partitions: 1
+        replication-factor: 1
+      - name: auth.logins
+        partitions: 1
+        replication-factor: 1
+      - name: system.errors
+        partitions: 1
+        replication-factor: 1
 
   cache:
     type: redis
@@ -73,4 +85,8 @@ banking:
     topics:
       systemErrors: system.errors
       users: auth.users
-      users-dlq: auth.users.dlq
+
+logging:
+  level:
+    org.springframework.kafka: DEBUG
+    org.apache.kafka: INFO

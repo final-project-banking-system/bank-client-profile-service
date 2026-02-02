@@ -1,21 +1,26 @@
 package banking.profile.config;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.KafkaAdmin;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+@Data
 @Configuration
 @ConfigurationProperties(prefix = "spring.kafka")
 public class KafkaTopicConfig {
+    private List<TopicConfig> topics;
+
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
@@ -27,13 +32,17 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    @ConditionalOnProperty(name = "banking.kafka.topics.users-dlq")
-    public NewTopic dlqTopic(
-            @Value("${banking.kafka.topics.users-dlq}") String dlqTopic
-    ) {
-        return TopicBuilder.name(dlqTopic)
-                .partitions(1)
-                .replicas(1)
-                .build();
+    public List<NewTopic> createTopics() {
+        return topics.stream()
+                .map(topic -> new NewTopic(topic.getName(), topic.getPartitions(), topic.getReplicationFactor()))
+                .toList();
+    }
+
+    @Getter
+    @Setter
+    public static class TopicConfig {
+        private String name;
+        private int partitions;
+        private short replicationFactor;
     }
 }

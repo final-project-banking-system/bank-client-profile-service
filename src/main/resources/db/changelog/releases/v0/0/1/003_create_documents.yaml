@@ -47,6 +47,12 @@ databaseChangeLog:
                   name: expires_at
                   type: timestamp
 
+              - column:
+                  name: version
+                  type: bigint
+                  constraints:
+                    nullable: false
+
         - addForeignKeyConstraint:
             baseTableName: documents
             baseColumnNames: profile_id

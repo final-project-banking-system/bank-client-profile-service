@@ -47,6 +47,12 @@ databaseChangeLog:
                   name: postal_code
                   type: varchar(20)
 
+              - column:
+                  name: version
+                  type: bigint
+                  constraints:
+                    nullable: false
+
         - addForeignKeyConstraint:
             baseTableName: addresses
             baseColumnNames: profile_id

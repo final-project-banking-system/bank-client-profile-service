@@ -1,4 +1,4 @@
-package banking.profile.exception;
+package banking.profile.error.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

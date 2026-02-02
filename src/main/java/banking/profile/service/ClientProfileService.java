@@ -2,7 +2,7 @@ package banking.profile.service;
 
 import banking.profile.dto.request.ClientProfileRequest;
 import banking.profile.dto.response.ClientProfileResponse;
-import banking.profile.exception.ClientProfileNotFoundException;
+import banking.profile.error.exception.ClientProfileNotFoundException;
 import banking.profile.mapper.ClientProfileMapper;
 import banking.profile.model.ClientProfileEntity;
 import banking.profile.repository.ClientProfileRepository;

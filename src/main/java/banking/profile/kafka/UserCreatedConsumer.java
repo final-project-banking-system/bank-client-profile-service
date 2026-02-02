@@ -12,12 +12,15 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class UserCreatedConsumer {
     private final ObjectMapper objectMapper;
     private final ClientProfileService clientProfileService;
+    private final ConcurrentHashMap<String, UserCreatedEvent> userCreatedEvents = new ConcurrentHashMap<>();
 
     @KafkaListener(
             topics = "${banking.kafka.topics.users}",
@@ -32,6 +35,11 @@ public class UserCreatedConsumer {
         String messageId = String.format("%s-%d-%d", record.topic(), record.partition(), record.offset());
 
         try {
+            if (userCreatedEvents.containsKey(messageId)) {
+                log.info("Дубликат пропущен [id={}]:",  messageId);
+                acknowledgment.acknowledge();
+            }
+
             log.info("Получено событие Kafka [id={}]: partition={}, offset={}",
                     messageId, record.partition(), record.offset());
 
@@ -52,6 +60,7 @@ public class UserCreatedConsumer {
             }
 
             UserCreatedEvent event = wrapper.getData();
+
             if (event.getUserId() == null || event.getEmail() == null) {
                 log.error("Недостаточно данных: userId={}, email={}",
                         event.getUserId(), event.getEmail());
@@ -65,7 +74,6 @@ public class UserCreatedConsumer {
         } catch (Exception exception) {
             log.error("Не удалось обработать событие [id={}] по созданию пользователя: {}",
                     messageId, exception.getMessage(), exception);
-            throw new RuntimeException(exception);
         }
     }
 }
