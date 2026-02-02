@@ -31,13 +31,14 @@ public class UserCreatedConsumer {
             @Payload String message,
             ConsumerRecord<String, String> record,
             Acknowledgment acknowledgment
-    ) {
+    ) throws Exception {
         String messageId = String.format("%s-%d-%d", record.topic(), record.partition(), record.offset());
 
         try {
             if (userCreatedEvents.containsKey(messageId)) {
                 log.info("Дубликат пропущен [id={}]:",  messageId);
                 acknowledgment.acknowledge();
+                return;
             }
 
             log.info("Получено событие Kafka [id={}]: partition={}, offset={}",
@@ -68,12 +69,15 @@ public class UserCreatedConsumer {
             }
 
             clientProfileService.createProfile(event.getUserId(), event.getEmail());
+
+            userCreatedEvents.put(messageId, event);
             acknowledgment.acknowledge();
             log.info("Обработано событие создания пользователя: userId={}, messageId={}",
                     event.getUserId(), messageId);
         } catch (Exception exception) {
             log.error("Не удалось обработать событие [id={}] по созданию пользователя: {}",
                     messageId, exception.getMessage(), exception);
+            throw exception;
         }
     }
 }

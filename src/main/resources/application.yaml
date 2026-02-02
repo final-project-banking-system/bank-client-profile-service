@@ -27,7 +27,7 @@ spring:
 
   kafka:
     admin:
-      auto-create: true
+      auto-create: false
       properties:
         offsets.topic.replication.factor: 1
         transaction.state.log.replication.factor: 1
@@ -41,21 +41,6 @@ spring:
       fetch-min-size: 1
     properties:
       enable.idempotence: true
-    listener:
-      missing-topics-fatal: false
-    topics:
-      - name: auth.users
-        partitions: 1
-        replication-factor: 1
-      - name: auth.users.dq
-        partitions: 1
-        replication-factor: 1
-      - name: auth.logins
-        partitions: 1
-        replication-factor: 1
-      - name: system.errors
-        partitions: 1
-        replication-factor: 1
 
   cache:
     type: redis
@@ -85,8 +70,3 @@ banking:
     topics:
       systemErrors: system.errors
       users: auth.users
-
-logging:
-  level:
-    org.springframework.kafka: DEBUG
-    org.apache.kafka: INFO
