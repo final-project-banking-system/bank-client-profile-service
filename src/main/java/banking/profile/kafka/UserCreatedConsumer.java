@@ -6,8 +6,13 @@ import banking.profile.service.ClientProfileService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
@@ -15,14 +20,29 @@ import org.springframework.stereotype.Component;
 public class UserCreatedConsumer {
     private final ObjectMapper objectMapper;
     private final ClientProfileService clientProfileService;
+    private final ConcurrentHashMap<String, UserCreatedEvent> userCreatedEvents = new ConcurrentHashMap<>();
 
     @KafkaListener(
             topics = "${banking.kafka.topics.users}",
-            groupId = "${spring.application.name}"
+            groupId = "${spring.application.name}",
+            containerFactory = "kafkaListenerManualCommitContainerFactory"
     )
-    public void handleUserCreated(String message) {
+    public void handleUserCreated(
+            @Payload String message,
+            ConsumerRecord<String, String> record,
+            Acknowledgment acknowledgment
+    ) throws Exception {
+        String messageId = String.format("%s-%d-%d", record.topic(), record.partition(), record.offset());
+
         try {
-            log.info("Получено событие Kafka: {}", message);
+            if (userCreatedEvents.containsKey(messageId)) {
+                log.info("Дубликат пропущен [id={}]:",  messageId);
+                acknowledgment.acknowledge();
+                return;
+            }
+
+            log.info("Получено событие Kafka [id={}]: partition={}, offset={}",
+                    messageId, record.partition(), record.offset());
 
             KafkaEventWrapper wrapper = objectMapper.readValue(
                     message,
@@ -31,22 +51,33 @@ public class UserCreatedConsumer {
 
             if (!"USER_CREATED".equals(wrapper.getEventType())) {
                 log.debug("Пропускаем событие с типом: {}", wrapper.getEventType());
+                acknowledgment.acknowledge();
                 return;
             }
 
             if (wrapper.getData() == null) {
-                log.error("Поле data пустое для такого типа события: {}", wrapper.getEventType());
-                return;
+                log.error("Поле data пустое для USER_CREATED события");
+                throw new IllegalArgumentException("Data is null for USER_CREATED event");
             }
 
             UserCreatedEvent event = wrapper.getData();
 
-            if (event.getUserId() != null && event.getEmail() != null) {
-                clientProfileService.createProfile(event.getUserId(), event.getEmail());
+            if (event.getUserId() == null || event.getEmail() == null) {
+                log.error("Недостаточно данных: userId={}, email={}",
+                        event.getUserId(), event.getEmail());
+                throw new IllegalArgumentException("Missing required fields: userId or email");
             }
+
+            clientProfileService.createProfile(event.getUserId(), event.getEmail());
+
+            userCreatedEvents.put(messageId, event);
+            acknowledgment.acknowledge();
+            log.info("Обработано событие создания пользователя: userId={}, messageId={}",
+                    event.getUserId(), messageId);
         } catch (Exception exception) {
-            log.error("Не удалось обработать событие по созданию пользователя: {}",
-                    exception.getMessage(), exception);
+            log.error("Не удалось обработать событие [id={}] по созданию пользователя: {}",
+                    messageId, exception.getMessage(), exception);
+            throw exception;
         }
     }
 }

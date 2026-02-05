@@ -1,5 +1,7 @@
-package banking.profile.exception;
+package banking.profile.error.handler;
 
+import banking.profile.error.ErrorResponse;
+import banking.profile.error.exception.ClientProfileNotFoundException;
 import banking.profile.service.SystemErrorPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +22,7 @@ public class GlobalExceptionHandler {
         systemErrorPublisher.publish(
                 "client-profile-service",
                 "UNHANDLED",
-                "Unhandled exception",
+                "Unhandled error",
                 ex);
 
         ErrorResponse errorResponse = new ErrorResponse(

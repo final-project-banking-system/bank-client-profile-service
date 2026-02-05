@@ -1,4 +1,4 @@
-package banking.profile.exception;
+package banking.profile.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

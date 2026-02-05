@@ -1,20 +1,16 @@
 package banking.profile.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
+import lombok.Setter;
 
 @Entity
 @Table(name = "addresses")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-public class AddressEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
+public class AddressEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id",  nullable = false)
     private ClientProfileEntity clientProfile;
